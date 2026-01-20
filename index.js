@@ -26,7 +26,13 @@ app.post('/forum/search', async (req, res) => {
 });
 
 app.post('/action/book', async (req, res) => {
-  const { forumId } = req.body;
+  const { payload, action } = req.body;
+  const { forumId } = payload;
+
+  switch (action) {
+    case 'ADD_TO_LIBRARY':
+      break;
+  }
 
   res.send({ status: 'ok' });
 });
