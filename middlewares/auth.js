@@ -4,9 +4,11 @@ import User from '../../models/User.js';
 export function auth() {
   return async (req, res, next) => {
     try {
-      const h = req.headers.authorization || '';
-      const token = h.startsWith('Bearer ') ? h.slice(7) : null;
+      const token = req.cookies?.token || null;
+      // const h = req.headers.authorization || '';
+      // const token = h.startsWith('Bearer ') ? h.slice(7) : null;
 
+      console.log('token', req.url, token);
       if (!token) return res.status(401).json({ error: 'NO_TOKEN' });
 
       const payload = jwt.verify(token, process.env.JWT_SECRET); // throws if invalid/expired

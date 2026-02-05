@@ -35,7 +35,16 @@ router.post('/register', async (req, res) => {
     const user = await User.create({ username: usernameNorm, passwordHash });
 
     const token = signToken(user);
-    res.json({ token });
+    // ✅ COOKIE УСТАНАВЛИВАЕТСЯ ЗДЕСЬ
+    res.cookie('token', token, {
+      httpOnly: true, // нельзя прочитать из JS
+      secure: false, // только https
+      sameSite: 'lax', // важно для фронта
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 дней
+      path: '/'
+    });
+
+    res.json({ ok: true });
   } catch (e) {
     console.error('register error', e);
     res.status(500).json({ error: 'SERVER_ERROR' });
@@ -53,13 +62,28 @@ router.post('/login', async (req, res) => {
     }
 
     const user = await User.findOne({ username: String(username).trim() });
-    if (!user) return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
+    if (!user) {
+      return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
+    }
 
     const ok = await bcrypt.compare(String(password), user.passwordHash);
-    if (!ok) return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
+
+    if (!ok) {
+      return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
+    }
 
     const token = signToken(user);
-    res.json({ token });
+
+    // ✅ COOKIE УСТАНАВЛИВАЕТСЯ ЗДЕСЬ
+    res.cookie('token', token, {
+      httpOnly: true, // нельзя прочитать из JS
+      secure: false, // только https
+      sameSite: 'lax', // важно для фронта
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 дней
+      path: '/'
+    });
+
+    res.json({ ok: true });
   } catch (e) {
     console.error('login error', e);
     res.status(500).json({ error: 'SERVER_ERROR' });
