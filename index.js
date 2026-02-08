@@ -1,5 +1,4 @@
 import express from 'express';
-import { auth } from './middlewares/auth.js';
 import cookieParser from 'cookie-parser';
 
 const app = express();
@@ -8,13 +7,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 const port = 3001;
 
-import authRouter from './routes/auth.js';
 import userRouter from './routes/users.js';
 import actionRouter from './routes/action.js';
 import booksRouter from './routes/books.js';
 import forumRouter from './routes/forum.js';
 
+import { auth } from './auth.js';
+import authRouter from './auth.js';
 app.use('/auth', authRouter);
+
 app.use('/user', auth(), userRouter);
 app.use('/action', auth(), actionRouter);
 app.use('/books', auth(), booksRouter);
