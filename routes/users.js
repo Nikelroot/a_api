@@ -4,6 +4,7 @@ import History from '../../models/History.js';
 import User from '../../models/User.js';
 import File from '../../models/File.js';
 import BookMark from '../../models/BookMark.js';
+import Late from '../../models/Late.js';
 
 router.put('/history', async (req, res) => {
   const { user } = req;
@@ -53,6 +54,7 @@ router.get('/history', async (req, res) => {
 
 router.get('/history/last', async (req, res) => {
   const { user } = req;
+  console.log('user', user);
   const userO = await User.findOne({ _id: user._id }).lean();
   let lastFile = userO.lastFile;
   let history = null;

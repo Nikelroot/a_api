@@ -22,8 +22,8 @@ router.get('/', async (req, res) => {
       }
     })
     .lean();
-  const collection = lib.books;
-  const count = lib.books.length;
+  const collection = lib?.books || [];
+  const count = lib?.books?.length || 0;
 
   res.json({
     collection,
