@@ -4,27 +4,28 @@ import History from '../../models/History.js';
 import User from '../../models/User.js';
 import File from '../../models/File.js';
 import BookMark from '../../models/BookMark.js';
-import Late from '../../models/Late.js';
+import moment from 'moment';
 
 router.put('/history', async (req, res) => {
   const { user } = req;
   const { fileId, time } = req.body;
 
-  await History.findOneAndUpdate(
+  const history = await History.findOneAndUpdate(
     {
-      user: user._id,
+      user: user.id,
       file: fileId
     },
     {
-      $set: { time }
+      $set: { time, lastUpdate: moment().unix() }
     },
-    { upsert: true }
-  ).exec();
+    { upsert: true, new: true }
+  ).lean();
 
   await User.updateOne({ _id: user._id }, { $set: { lastFile: fileId } }).exec();
 
   res.send({
-    status: 'ok'
+    status: 'ok',
+    history
   });
 });
 
@@ -38,9 +39,8 @@ router.get('/history', async (req, res) => {
     });
   }
 
-  const userO = await User.findOne({ _id: user._id }).lean();
   const history = await History.findOne({
-    user: user._id,
+    user: user.id,
     file: fileId
   }).lean();
 
@@ -55,22 +55,15 @@ router.get('/history', async (req, res) => {
 router.get('/history/last', async (req, res) => {
   const { user } = req;
   console.log('user', user);
-  const userO = await User.findOne({ _id: user._id }).lean();
-  let lastFile = userO.lastFile;
-  let history = null;
-  let file = null;
 
-  if (lastFile) {
-    history = await History.findOne({
-      user: user._id,
-      file: lastFile
-    }).lean();
-    file = await File.findOne({ _id: lastFile }).lean();
-  }
+  let history =
+    (await History.findOne({ user: user.id }).sort({ lastUpdate: -1 }).populate('file').lean()) ||
+    null;
+  const lastFile = history?.file || null;
 
   res.send({
     history,
-    file
+    file: lastFile
   });
 });
 
