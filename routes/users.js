@@ -2,6 +2,7 @@ import express from 'express';
 const router = express.Router();
 import History from '../../models/History.js';
 import User from '../../models/User.js';
+import Book from '../../models/Book.js';
 import File from '../../models/File.js';
 import BookMark from '../../models/BookMark.js';
 import moment from 'moment';
@@ -54,11 +55,20 @@ router.get('/history', async (req, res) => {
 
 router.get('/history/last', async (req, res) => {
   const { user } = req;
-  console.log('user', user);
 
   let history =
-    (await History.findOne({ user: user.id }).sort({ lastUpdate: -1 }).populate('file').lean()) ||
-    null;
+    (await History.findOne({ user: user.id })
+      .sort({ lastUpdate: -1 })
+      .populate({
+        path: 'file',
+        populate: {
+          path: 'book',
+          populate: {
+            path: 'forum'
+          }
+        }
+      })
+      .lean()) || null;
   const lastFile = history?.file || null;
 
   res.send({

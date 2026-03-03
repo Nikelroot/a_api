@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import Library from '../../models/Library.js';
+import Forum from '../../models/Forum.js';
 import '../../models/File.js';
 import History from '../../models/History.js';
 
@@ -26,13 +27,20 @@ router.get('/', async (req, res) => {
     const lib = await Library.findOne(q)
       .populate({
         path: 'books',
-        populate: {
-          path: 'files',
-          options: {
-            sort: { name: 1 }
+        populate: [
+          {
+            path: 'forum',
+            model: Forum
+          },
+          {
+            path: 'files',
+            options: {
+              sort: { name: 1 }
+            }
           }
-        }
+        ]
       })
+      .setOptions({ strictPopulate: false })
       .lean();
 
     let collection = lib?.books || [];
