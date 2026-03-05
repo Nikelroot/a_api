@@ -27,7 +27,7 @@ router.post('/search', async (req, res) => {
     .limit(Number(limit))
     .lean();
 
-  const books = await Library.findOne({ user: req.user._id }).lean();
+  const books = await Library.findOne({ user: req.user.id }).lean();
   const bookIds = (books?.books || []).map((id) => id.toString());
 
   collection = collection.map((item) => {

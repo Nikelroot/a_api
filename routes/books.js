@@ -12,6 +12,7 @@ import History from '../../models/History.js';
 router.get('/', async (req, res) => {
   try {
     const { user } = req;
+
     const { search, limit = 100, skip = 0 } = req.query;
 
     // Валидация параметров
@@ -19,7 +20,7 @@ router.get('/', async (req, res) => {
     const parsedSkip = Math.max(parseInt(skip) || 0, 0);
 
     const q = {
-      user: user._id
+      user: user.id
     };
 
     // Оптимизированный запрос с populate вместо множественных find
@@ -34,6 +35,8 @@ router.get('/', async (req, res) => {
         }
       })
       .lean();
+
+    console.log('user', user, lib);
 
     let collection = lib?.books || [];
 

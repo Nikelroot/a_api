@@ -21,7 +21,7 @@ router.post('/book', async (req, res) => {
   switch (action) {
     case 'ADD_TO_LIBRARY':
       await Library.findOneAndUpdate(
-        { user: user._id },
+        { user: user.id },
         { $addToSet: { books: forumId } },
         { upsert: true }
       );
@@ -40,7 +40,7 @@ router.post('/book', async (req, res) => {
 
       break;
     case 'REMOVE_TO_LIBRARY':
-      await Library.updateOne({ user: user._id }, { $pull: { books: forumId } });
+      await Library.updateOne({ user: user.id }, { $pull: { books: forumId } });
       break;
     case 'UPDATE_TIME':
       break;

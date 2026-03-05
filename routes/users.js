@@ -22,7 +22,7 @@ router.put('/history', async (req, res) => {
     { upsert: true, new: true }
   ).lean();
 
-  await User.updateOne({ _id: user._id }, { $set: { lastFile: fileId } }).exec();
+  await User.updateOne({ _id: user.id }, { $set: { lastFile: fileId } }).exec();
 
   res.send({
     status: 'ok',
@@ -86,7 +86,7 @@ router.post('/history/bookMark', async (req, res) => {
     });
   }
   let bookMark = new BookMark({
-    user: user._id,
+    user: user.id,
     time,
     file: fileId
   });
@@ -107,7 +107,7 @@ router.get('/history/bookMark', async (req, res) => {
     });
   }
   let bookMarks = await BookMark.find({
-    user: user._id,
+    user: user.id,
     file: fileId
   }).lean();
 

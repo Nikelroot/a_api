@@ -22,7 +22,10 @@ export function auth() {
       if (!user) return res.status(401).json({ error: 'USER_NOT_FOUND' });
       if (user.isBlocked) return res.status(403).json({ error: 'USER_BLOCKED' });
 
-      req.user = user; // теперь req.user — актуальный пользователь из БД
+      req.user = {
+        ...user,
+        id: user._id.toString()
+      };
       next();
     } catch (e) {
       return res.status(401).json({ error: 'INVALID_TOKEN' });
