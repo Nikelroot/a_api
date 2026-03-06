@@ -19,7 +19,8 @@
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
     "mongoose": "^9.1.4",
-    "qbittorrent-api-v2": "^1.2.2"
+    "qbittorrent-api-v2": "^1.2.2",
+    "winston": "^3.18.3"
   },
   "repository": {
     "type": "git",

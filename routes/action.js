@@ -6,6 +6,7 @@ const router = express.Router();
 import Library from '../../models/Library.js';
 import Forum from '../../models/Forum.js';
 import '../../models/File.js';
+import apiLogger from '../utils/apiLogger.js';
 
 router.post('/book', async (req, res) => {
   const { user } = req;
@@ -35,7 +36,9 @@ router.post('/book', async (req, res) => {
           tags: `${forum._id.toString()}`,
           paused: false
         });
-        console.log(forum.title, resp);
+        apiLogger.info(
+          `add magnet forumId=${forum._id.toString()} title="${forum.title}" response=${JSON.stringify(resp)}`
+        );
       }
 
       break;

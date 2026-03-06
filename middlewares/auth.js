@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../../models/User.js';
+import apiLogger from '../utils/apiLogger.js';
 
 export function auth() {
   return async (req, res, next) => {
@@ -8,7 +9,7 @@ export function auth() {
       // const h = req.headers.authorization || '';
       // const token = h.startsWith('Bearer ') ? h.slice(7) : null;
 
-      console.log('token', req.url, token);
+      apiLogger.debug(`auth check url=${req.originalUrl} hasToken=${Boolean(token)}`);
       if (!token) return res.status(401).json({ error: 'NO_TOKEN' });
 
       const payload = jwt.verify(token, process.env.JWT_SECRET); // throws if invalid/expired
@@ -28,6 +29,7 @@ export function auth() {
       };
       next();
     } catch (e) {
+      apiLogger.warn(`invalid token url=${req.originalUrl}: ${e?.message || e}`);
       return res.status(401).json({ error: 'INVALID_TOKEN' });
     }
   };

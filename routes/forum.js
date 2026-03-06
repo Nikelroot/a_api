@@ -2,6 +2,7 @@ import express from 'express';
 const router = express.Router();
 import Forum from '../../models/Forum.js';
 import Library from '../../models/Library.js';
+import apiLogger from '../utils/apiLogger.js';
 
 router.get('/', async (req, res) => {
   const collection = await Forum.find().sort({ title: 1 }).skip(0).limit(10).lean();
@@ -11,7 +12,10 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/search', async (req, res) => {
-  const { search, limit = 100, skip = 0 } = req.body;
+  const { search, limit = 25, page = 1 } = req.body;
+  const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 25, 1), 100);
+  const parsedPage = Math.max(parseInt(page, 10) || 1, 1);
+  const skip = (parsedPage - 1) * parsedLimit;
   const q = {};
 
   if (search && search.length !== 0) {
@@ -20,11 +24,13 @@ router.post('/search', async (req, res) => {
     q.inLibrary = true;
   }
 
-  console.log('q', q);
+  apiLogger.debug(
+    `forum search query=${JSON.stringify(q)} page=${parsedPage} limit=${parsedLimit}`
+  );
   let collection = await Forum.find(q)
     .sort({ title: 1 })
-    .skip(Number(skip))
-    .limit(Number(limit))
+    .skip(skip)
+    .limit(parsedLimit)
     .lean();
 
   const books = await Library.findOne({ user: req.user.id }).lean();
@@ -39,7 +45,10 @@ router.post('/search', async (req, res) => {
 
   res.json({
     collection,
-    count
+    count,
+    limit: parsedLimit,
+    page: parsedPage,
+    totalPages: Math.ceil(count / parsedLimit)
   });
 });
 

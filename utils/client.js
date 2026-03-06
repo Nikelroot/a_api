@@ -47,6 +47,16 @@ export class QBittorrentClient {
 
     try {
       return await fetch(url, { ...init, signal: controller.signal });
+    } catch (error) {
+      const method = init.method || 'GET';
+      const reason =
+        error?.name === 'AbortError'
+          ? `timeout after ${this.timeoutMs}ms`
+          : error?.cause?.code || error?.cause?.message || error?.message || String(error);
+
+      throw new Error(`qBittorrent request failed: ${method} ${url}. ${reason}`, {
+        cause: error
+      });
     } finally {
       clearTimeout(t);
     }

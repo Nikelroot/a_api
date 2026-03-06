@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../../models/User.js';
+import apiLogger from '../utils/apiLogger.js';
 
 const router = express.Router();
 
@@ -46,7 +47,7 @@ router.post('/register', async (req, res) => {
 
     res.json({ ok: true });
   } catch (e) {
-    console.error('register error', e);
+    apiLogger.error(`register error: ${e?.stack || e?.message || e}`);
     res.status(500).json({ error: 'SERVER_ERROR' });
   }
 });
@@ -85,7 +86,7 @@ router.post('/login', async (req, res) => {
 
     res.json({ ok: true });
   } catch (e) {
-    console.error('login error', e);
+    apiLogger.error(`login error: ${e?.stack || e?.message || e}`);
     res.status(500).json({ error: 'SERVER_ERROR' });
   }
 });
